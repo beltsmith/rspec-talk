@@ -1,0 +1,178 @@
+#+TITLE: Oracular RSpectacular
+#+SUBTITLE: Achieving trust through thoughtful thorough testing
+#+SUBSUBTITLE: AT&T&T&T&T
+
+* Timeline
+- 00 Preamble
+  + 00 Why?
+  + 02 How?
+- 05 DSL
+  + 06 describe
+  + 07 context
+  + 08 subject/let(!)
+  + 10 it/specify
+  + 12
+* Preamble
+** What?
+*** Main Goal
+** How?
+* DSL
+As RSpec is a DSL, generally everything you do should revolve around
+the DSL
+** describe
+#+begin_src ruby
+describe Bike do
+  describe "#shift_up" do
+    subject(:shift_up) { bike.shift_up }
+    let(:bike) { described_class.new }
+  end
+end
+#+end_src
+#+begin_quote
+Describe blocks convey what is being tested, whether that be a class
+or a method. Unless you're testing an implicit subject, in this case
+`Bike`, you should generally be setting a new subject inside a describe block
+#+end_quote
+** context
+#+begin_src ruby
+context "when in highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
+end
+#+end_src
+#+begin_quote
+Context blocks provide context to the current example, generally here
+is where you'll setup the state of the world you're testing
+#+end_quote
+** subject/let(!)
+** it/
+** shared_examples
+** shared_context
+** should
+You _should_ n't use it
+* Plague Bringers
+#+begin_quote
+Not really but they smell
+#+end_quote
+* Pro tips
+Various things which generally can't be statically detected and rely
+on the writer's experience
+** Incidental State or How I Learned to Stop Worrying and Love Block Expectations
+#+begin_src ruby
+# bad
+it 'publishes the article' do
+  article.publish
+
+  # Creating another shared Article test object above would cause this
+  # test to break
+  expect(Article.count).to eq(2)
+end
+
+# good
+it 'publishes the article' do
+  expect { article.publish }.to change(Article, :count).by(1)
+end
+#+end_src
+#+begin_quote
+Honestly I couldn't put it better than rubocop's rspec style guide,
+becoming comfortable with block expectations greatly increases your
+ability to write readable and confident specs
+#+end_quote
+** Multiple Expectations
+#+begin_quote
+This was actually something brought up when we added rubocop-rspec to
+flatbook so I'd like to spend a bit discussing the theory. There are
+two ways this can be handled inside of the specs and other ways you
+can restructure your code to make them less desireable overall.
+#+end_quote
+*** In the examples
+**** Separate examples
+#+begin_src ruby
+describe ""
+#+end_src
+#+begin_quote
+There are two main downsides to this approach, it increases the amount
+of examples you run, and due to having to setup the context each time
+increases the run time more than having them in the same example.
+
+The main reason you'd choose this approach is that it's the convention
+of rspec, i.e. single expectation per spec
+#+end_quote
+**** Aggregate failures
+#+begin_src ruby
+
+#+end_src
+**** Compound expectations
+** I lied
+When testing the idempotency of something, if you're calling
+a ~let~ (e.g. a named subject) you're getting a memoised value which
+will give you a false sense of idempotency.
+#+begin_src ruby
+describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+
+  specify "shifting multiple times changes gear each time" do
+    expect { shift_up }.to change(bike, :gear).by(1)
+    expect { shift_up }.to change(bike, :gear).by(1) # wil fail
+  end
+end
+#+end_src
+#+begin_quote
+In this case prefer calling a method on an object instead
+#+end_quote
+#+begin_src ruby
+describe "#shift_up" do
+  specify "shifting multiple times changes gear each time" do
+    expect { bike.shift_up }.to change(bike, :gear).by(1)
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will fail
+  end
+end
+#+end_src
+#+begin_quote
+This used to be "supported" (read: clever use of game mechanics) with
+implicit block expectations, however others don't seem so keen to
+exploits ¯\_(ツ)_/¯
+#+end_quote
+#+begin_src ruby
+describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+
+  specify "shifting multiple times changes gear each time" do
+    is_expected.to change(bike, :gear).by(1)
+    is_expected.to change(bike, :gear).by(1) # will work
+  end
+end
+#+end_src
+* Struggle Bus
+* References
+Various code snippets and ideas from [[https://rspec.rubystyle.guide/][rubocop rspec-style-guide]]
+* Garbage
+** Why?
+#+begin_quote
+
+#+end_quote
+*** Quote
+#+begin_quote
+Fear leads to panic, panic leads to pain
+Pain leads anger, anger leads to hate
+- IDLES, Danny Nedelko
+#+end_quote
+
+*** Fear?
+#+begin_quote
+Will this change work?
+#+end_quote
+*** Panic?
+#+begin_quote
+What if this breaks another part?
+#+end_quote
+*** Pain?
+#+begin_quote
+Why is this so hard to test?
+#+end_quote
+*** Anger?
+#+begin_quote
+#+end_quote
+*** Hate?
+#+begin_quote
+
+#+end_quote
