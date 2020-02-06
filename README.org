@@ -1,65 +1,492 @@
 #+TITLE: Oracular RSpectacular
-#+SUBTITLE: Achieving trust through thoughtful thorough testing
+#+SUBTITLE: Achieving trust through thorough thoughtful testing
 #+SUBSUBTITLE: AT&T&T&T&T
-
+#+REVEAL_PLUGINS: (highlight)
+#+REVEAL_THEME: black
+#+REVEAL_INIT_OPTIONS: slideNumber:false
+#+OPTIONS: toc:nil ^:nil
 * Timeline
-- 00 Preamble
-  + 00 Why?
-  + 02 How?
-- 05 DSL
-  + 06 describe
-  + 07 context
-  + 08 subject/let(!)
-  + 10 it/specify
-  + 12
+- Preamble
+- DSL
+- Pro Tips (by Tony Hawk)
 * Preamble
-** What?
-*** Main Goal
+#+begin_notes
+Most slides will have some code, not all of it will be best practice, but
+eventually we should get there.
+
+As this talk is designed so everyone can get something out of it, if
+you're unsure of something or don't understand please ask questions.
+#+end_notes
+** Goals
+*** Increase your knowledge of RSpec
+#+begin_notes
+I don't want this to be taken as patronising, I believe one should never
+stop learning. Even while preparing this talk I've learned a few
+things myself which have already impacted the way I write specs.
+#+end_notes
+*** Increase your comfort level in RSpec
+#+begin_notes
+Just like any other tool, the more knowledgeable of something you are
+the more comfortable you should be using it.
+#+end_notes
+*** Increase the reliability and readability of specs
+#+begin_notes
+RSpec is designed not just to be written, but also read. Following
+best practices will help you write more readable specs which in turn
+will make them more reliable and maintainable.
+
+If you can understand what a spec should do, you should be able to
+understand it.
+
+As a rule of thumb, the documentation string should provide enough
+context to know what the example is testing
+
+Sometimes they can get pretty verbose, but that should be a sign that
+there is a lot of context going into the example you're describing
+#+end_notes
 ** How?
+[[./assets/bikes.jpg]]
+#+begin_notes
+I'm taking a page out of Sandi Metz's book, take something everyone
+should be familiar with and relating to a subject matter they may not
+be familiar with.
+#+end_notes
+*** Explain the DSL
+Start simple and build up
+#+begin_notes
+In this case we'll be looking at specs for a Bike and without looking
+into how it's implemented I should be able thoroughly describe how a
+Bike works.
+#+end_notes
+*** Explain the Friction and Pain
+#+begin_notes
+Generally either mean you're moving in a direction your tool doesn't want
+you to.
+#+end_notes
+Bike time!
+#+begin_notes
+Imagine you're riding a bike and decide you want to stop. You grab the
+tyre eventually coming to a stop, but not with nearly as much skin on
+your hands as when you started. Sure it worked, but there are other
+tools you can utilise to remove the pain and make your life easier.
+#+end_notes
+** What won't be covered (today)
+*** Capybara
+#+begin_notes
+This is basically a separate DSL ontop of the RSpec DSL, I will be
+covering this in a separate talk to give it the attention it deserves.
+#+end_notes
+*** Quantum Field Theory
+#+begin_notes
+Honestly I just don't time, but I'd love to chat about it
+#+end_notes
 * DSL
-As RSpec is a DSL, generally everything you do should revolve around
-the DSL
+As RSpec is a DSL, generally everything you do utilise the DSL
+#+begin_notes
+This may seem an odd order to do things in, but I'd rather focus on as
+few things at a time so that everything gets the attention it
+deserves.
+
+Throughout these examples we will be
+#+end_notes
+** let
+#+begin_src ruby
+let(:bike) { Bike.new }
+#+end_src
+#+begin_notes
+Let is one of the most basic concepts in RSpec, it is how you introduce
+important variables to scope of what you're testing.
+#+end_notes
+*** let!
+#+begin_src ruby
+let!(:bike) { Bike.new }
+#+end_src
+#+begin_notes
+let! is let but with a reference in an implicit before block, this
+allows you to evaluate and memoise the value before any of your
+example runs
+#+end_notes
+** subject
+#+begin_src ruby
+subject { bike.gear }
+#+end_src
+#+begin_notes
+Subject is used to communicate to the reader what is being tested.
+
+Internally it's mostly just let(:subject)
+#+end_notes
+*** subject!
+#+begin_src ruby
+subject! { bike.gear }
+#+end_src
+*** named subject
+#+begin_src ruby
+subject(:shift_up) { bike.shift_up }
+#+end_src
 ** describe
+Convey what is being tested
+#+begin_notes
+Describe blocks convey what is being tested, whether that be a class
+or a method.
+
+Furthermore you should generally limit the depth of describe blocks to
+two, one for your class and another for your method.
+#+end_notes
+*** class
 #+begin_src ruby
 describe Bike do
-  describe "#shift_up" do
-    subject(:shift_up) { bike.shift_up }
-    let(:bike) { described_class.new }
-  end
 end
 #+end_src
-#+begin_quote
-Describe blocks convey what is being tested, whether that be a class
-or a method. Unless you're testing an implicit subject, in this case
-`Bike`, you should generally be setting a new subject inside a describe block
-#+end_quote
+*** method
+#+begin_src ruby
+describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+  let(:bike) { described_class.new }
+end
+#+end_src
+#+begin_notes
+Method describe block names should reflect the method you're testing
+#+end_notes
 ** context
 #+begin_src ruby
 context "when in highest gear" do
   let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
 end
 #+end_src
-#+begin_quote
+#+begin_notes
 Context blocks provide context to the current example, generally here
 is where you'll setup the state of the world you're testing
-#+end_quote
-** subject/let(!)
-** it/
-** shared_examples
-** shared_context
-** should
-You _should_ n't use it
-* Plague Bringers
+#+end_notes
+*** Negative case
+#+begin_src ruby
+context "when not in the highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MIN_GEAR) }
+end
+#+end_src
+** it
+#+begin_src ruby
+it "shifts up one gear" do
+  expect { shift_up }.to change(bike, :gear).by(1)
+end
+#+end_src
 #+begin_quote
-Not really but they smell
+Bike #shift_up when not in the highest gear shifts up one gear
 #+end_quote
-* Pro tips
+#+begin_notes
+It blocks are the way you describe the behaviour, the most common form
+is a multi-line it block with a description and a body with generally
+one expectation.
+#+end_notes
+*** single line
+#+begin_src ruby
+it { expect { shift_up }.to change(bike, :gear).by(1) }
+#+end_src
+#+begin_quote
+Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+#+end_quote
+#+begin_notes
+Sometimes it's easier and cleaner to use a single line expectation.
+For this form you will omit the documentation string and sometimes
+switch to using is_expected over expect(subject), this should only be
+used when it makes the
+#+end_notes
+** specify
+#+begin_src ruby
+specify { expect { shift_up }.to change(bike, :gear).by(1) }
+#+end_src
+#+begin_quote
+Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+#+end_quote
+#+begin_notes
+Specify's primary use is when creating an example without a dosctring,
+and with multiple lines the last executed example will produce the
+docstring
+#+end_notes
+*** specify with docstring
+#+begin_src ruby
+specify "when called multiple times is idempotent" do
+  # ...
+end
+#+end_src
+#+begin_notes
+The lesser used form with a docstring should only be used when a
+docstring reads poorly with it, remember specs are going to be read
+more often than written.
+
+Generally I'd discourage the use of either, as they make the source
+code arguably harder to read, but do have their place
+#+end_notes
+** TODO hooks
+#+begin_src ruby
+  before { bike.remove_chain }
+  after { bike.install_chain }
+  # or
+  around do |example|
+    bike.remove_chain
+    example.call
+    bike.install_chain
+  end
+#+end_src
+#+begin_notes
+Hooks allow you to setup the state of the world in a way which lets
+won't let you do.
+
+Most of your shared setup should go inside of before blocks
+#+end_notes
+** shared context
+#+begin_src ruby
+shared_context "in highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
+end
+#+end_src
+#+begin_notes
+Is their copy pasta inside your specs? Shared contexts are your saviour.
+#+end_notes
+** TODO shared examples
+#+begin_notes
+Ever seen iteration with an it block inside of it? This is what shared
+examples are for. They allow you to abstract out the functionality to
+code blocks which you can include.
+#+end_notes
+** should
+You _should_ not use it
+#+begin_notes
+It's a big monkey patch which has since fallen out of favour with the
+preference now being to use expect.
+#+end_notes
+* Take Aways
+** Friction and Pain
+Generally either mean you're moving in a direction your tool doesn't want
+you to.
+* Pro tips (by Tony Hawk)
 Various things which generally can't be statically detected and rely
 on the writer's experience
 ** Incidental State or How I Learned to Stop Worrying and Love Block Expectations
 #+begin_src ruby
 # bad
-it 'publishes the article' do
+it "shifts up one gear" do
+  previous_gear = bike.gear
+  shift_up
+  # ...
+  expect(bike.gear).to eq previous + 1
+end
+
+# good
+it "shifts up one gear" do
+  expect { shift_up }.to change(bike, :gear).by(1)
+end
+#+end_src
+#+begin_notes
+By utilising block expectations we limit the scope in which we're
+testing, which allows us to better understand exactly what is being
+tested as well as isolates us from
+#+end_notes
+*** Raise error
+#+begin_src ruby
+context "when chain is disconnected" do
+  include_conext "chain disconnected"
+
+  it { expect { shift_up }.to raise_error /No chain/ }
+end
+#+end_src
+#+begin_notes
+If you've seen block expectations before, this is likely where you've
+seen them.
+
+I find them mainly useful when working with external libraries that
+utilise exceptions for control flow. Generally in code you own you
+should avoid exceptions as control flow but occassionaly they do have
+their place.
+#+end_notes
+*** Composing matchers
+#+begin_src ruby
+  describe "#remove_chain" do
+    # ...
+    context "when chain is attached" do
+      include_context "chain is attached"
+
+      specify do
+        expect { remove_chain }.to change(bike, :chain_attached?)
+                                     .from(true)
+                                     .to(false)
+      end
+    end
+  end
+#+end_src
+#+begin_notes
+Now that we've seen a bit of composing, lets take a look at a more
+composed example.
+
+While this is a semi-contrived example it shows a way that you can add
+additional conditions to your example without adding additional
+expectations.
+
+Imagine (all the people) a scenario where this example was given a
+bike without the chain attached. If you hadn't used the combination of
+from and to you would get a false positive if #remove_chain doesn't
+raise an error when no chain is attached.
+#+end_notes
+*** TODO Yielding
+#+begin_src ruby
+
+#+end_src
+#+begin_notes
+Yielding matchers are indispensable when working with custom
+containers or methods that help facilitate iteration.
+#+end_notes
+** So I lied
+#+begin_src ruby
+describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+
+  specify "when called multiple times increases the gear each time" do
+    expect { shift_up }.to change(bike, :gear).by(1) # will pass
+    expect { shift_up }.to change(bike, :gear).by(1) # will fail
+  end
+end
+#+end_src
+#+begin_quote
+When testing the idempotency of something, if you're calling
+a ~let~ (e.g. a named subject) you're getting a memoised value which
+will give you a false sense of idempotency.
+#+end_quote
+*** Making it work
+#+begin_src ruby
+describe "#shift_up" do
+  specify "when called multiple times changes gear each time" do
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will pass
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will also pass
+  end
+end
+#+end_src
+#+begin_notes
+In this case prefer calling a method on an object instead
+#+end_notes
+*** Clever use of game mechanics (exploits)
+#+begin_src ruby
+describe "#shift_up" do
+  subject(:shift_up) { -> { bike.shift_up } }
+
+  specify "when called multiple times changes gear each time" do
+    is_expected.to change(bike, :gear).by(1) # will pass
+    is_expected.to change(bike, :gear).by(1) # will also pass
+  end
+end
+#+end_src
+[[./assets/itjustworks.jpg]]
+#+begin_notes
+This used to be "supported" (read: clever use of game mechanics) with
+implicit block expectations, however others don't seem so keen to
+exploits ¯\_(ツ)_/¯
+#+end_notes
+** Multiple Expectations
+#+begin_notes
+This was actually something brought up when we added rubocop-rspec to
+flatbook so I'd like to spend a bit discussing the theory. There are
+two ways this can be handled inside of the specs and other ways you
+can restructure your code to make them less desireable overall.
+#+end_notes
+*** Separate examples
+#+begin_src ruby
+it { is_expected.to start_with("WARNING:") }
+it { is_expected.to end_with "!" }
+#+end_src
+#+begin_quote
+1) warning is expected to start with "WARNING:"
+   Failure/Error: it { is_expected.to start_with("WARNING:") }
+     expected "WARN -- Something is messed up." to start with "WARNING:"
+
+2) warning is expected to end with "!"
+   Failure/Error: it { is_expected.to end_with "!" }
+     expected "WARN -- Something is messed up." to end with "!"
+#+end_quote
+#+begin_notes
+There are two main downsides to this approach, it increases the amount
+of examples you run, and due to having to setup the context each time
+increases the run time more than having them in the same example.
+
+The main reason you'd choose this approach is that it's the convention
+of rspec, i.e. single expectation per spec and usually you're going to
+get more readable expectations
+#+end_notes
+*** Aggregate failures
+#+begin_src ruby
+it "passes our validations", aggregate_failures: true do
+  expect(warning).to start_with("WARNING:")
+  expect(warning).to end_with("!")
+end
+#+end_src
+#+begin_quote
+1) warning passes our validations
+   Got 2 failures:
+
+   1.1) Failure/Error: expect(warning).to start_with("WARNING:")
+          expected "WARN -- Something is messed up." to start with "WARNING:"
+
+   1.2) Failure/Error: expect(warning).to end_with("!")
+          expected "WARN -- Something is messed up." to end with "!"
+#+end_quote
+#+begin_notes
+#+end_notes
+*** Compound expectations
+#+begin_src ruby
+it { is_expected.to start_with("WARNING:").and end_with("!") }
+#+end_src
+#+begin_quote
+1) warning is expected to start with "WARNING:" and end with "!"
+   Failure/Error: it { is_expected.to start_with("WARNING:").and end_with("!") }
+
+        expected "WARN -- Something is messed up." to start with "WARNING:"
+
+     ...and:
+
+        expected "WARN -- Something is messed up." to end with "!"
+#+end_quote
+** Custom Matchers
+#+begin_src ruby
+RSpec::Matchers.define :be_a_warning do
+  match do |actual|
+    actual.start_with?("WARNING:") && actual.end_with?("!")
+  end
+end
+
+it { is_expected.to be_a_warning }
+#+end_src
+#+begin_notes
+Following the previous multiple expectations for detecting a warning
+here is how one could write a custom matcher to handle both of the
+expectations.
+
+Most complex expectations which have multiple "expectations" I would
+geenerally write matchers for. This allows you to name what you're
+expecting and provides greater flexability around
+#+end_notes
+*** TODO Complex Custom Matcher
+#+begin_src ruby
+RSpec::Matchers.define :be_bigger_than do |first|
+  match do |actual|
+    (actual > first) && (actual < @second)
+  end
+
+  chain :but_smaller_than do |second|
+    @second = second
+  end
+end
+
+describe 5 do
+  it { should be_bigger_than(4).but_smaller_than(6) }
+end
+#+end_src
+#+begin_notes
+#+end_notes
+* Struggle Bus
+* References
+Various code snippets and ideas from [[https://rspec.rubystyle.guide/][rubocop rspec-style-guide]]
+* Garbage
+** More real world example                                             :cut:
+#+begin_src ruby
+# bad
+it "publishes the article" do
   article.publish
 
   # Creating another shared Article test object above would cause this
@@ -68,111 +495,12 @@ it 'publishes the article' do
 end
 
 # good
-it 'publishes the article' do
+it "publishes the article" do
   expect { article.publish }.to change(Article, :count).by(1)
 end
 #+end_src
-#+begin_quote
+#+begin_notes
 Honestly I couldn't put it better than rubocop's rspec style guide,
 becoming comfortable with block expectations greatly increases your
 ability to write readable and confident specs
-#+end_quote
-** Multiple Expectations
-#+begin_quote
-This was actually something brought up when we added rubocop-rspec to
-flatbook so I'd like to spend a bit discussing the theory. There are
-two ways this can be handled inside of the specs and other ways you
-can restructure your code to make them less desireable overall.
-#+end_quote
-*** In the examples
-**** Separate examples
-#+begin_src ruby
-describe ""
-#+end_src
-#+begin_quote
-There are two main downsides to this approach, it increases the amount
-of examples you run, and due to having to setup the context each time
-increases the run time more than having them in the same example.
-
-The main reason you'd choose this approach is that it's the convention
-of rspec, i.e. single expectation per spec
-#+end_quote
-**** Aggregate failures
-#+begin_src ruby
-
-#+end_src
-**** Compound expectations
-** I lied
-When testing the idempotency of something, if you're calling
-a ~let~ (e.g. a named subject) you're getting a memoised value which
-will give you a false sense of idempotency.
-#+begin_src ruby
-describe "#shift_up" do
-  subject(:shift_up) { bike.shift_up }
-
-  specify "shifting multiple times changes gear each time" do
-    expect { shift_up }.to change(bike, :gear).by(1)
-    expect { shift_up }.to change(bike, :gear).by(1) # wil fail
-  end
-end
-#+end_src
-#+begin_quote
-In this case prefer calling a method on an object instead
-#+end_quote
-#+begin_src ruby
-describe "#shift_up" do
-  specify "shifting multiple times changes gear each time" do
-    expect { bike.shift_up }.to change(bike, :gear).by(1)
-    expect { bike.shift_up }.to change(bike, :gear).by(1) # will fail
-  end
-end
-#+end_src
-#+begin_quote
-This used to be "supported" (read: clever use of game mechanics) with
-implicit block expectations, however others don't seem so keen to
-exploits ¯\_(ツ)_/¯
-#+end_quote
-#+begin_src ruby
-describe "#shift_up" do
-  subject(:shift_up) { bike.shift_up }
-
-  specify "shifting multiple times changes gear each time" do
-    is_expected.to change(bike, :gear).by(1)
-    is_expected.to change(bike, :gear).by(1) # will work
-  end
-end
-#+end_src
-* Struggle Bus
-* References
-Various code snippets and ideas from [[https://rspec.rubystyle.guide/][rubocop rspec-style-guide]]
-* Garbage
-** Why?
-#+begin_quote
-
-#+end_quote
-*** Quote
-#+begin_quote
-Fear leads to panic, panic leads to pain
-Pain leads anger, anger leads to hate
-- IDLES, Danny Nedelko
-#+end_quote
-
-*** Fear?
-#+begin_quote
-Will this change work?
-#+end_quote
-*** Panic?
-#+begin_quote
-What if this breaks another part?
-#+end_quote
-*** Pain?
-#+begin_quote
-Why is this so hard to test?
-#+end_quote
-*** Anger?
-#+begin_quote
-#+end_quote
-*** Hate?
-#+begin_quote
-
-#+end_quote
+#+end_notes

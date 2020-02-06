@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Oracular RSpectacular</title>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/npm/reveal.js/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/npm/reveal.js/css/theme/black.css" id="theme"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/npm/reveal.js/lib/css/zenburn.css"/>
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/npm/reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h1 class="title">Oracular RSpectacular</h1><p class="subtitle">(Achieving trust through thorough thoughtful testing)</p>
+<p class="date">Created: 2020-02-06 Thu 00:21</p>
+</section>
+<section>
+<section id="slide-orge9921bd">
+<h2 id="orge9921bd"><span class="section-number-2">1</span> Timeline</h2>
+<ul>
+<li>Preamble</li>
+<li>DSL</li>
+<li>Pro Tips (by Tony Hawk)</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-org7da2bf2">
+<h2 id="org7da2bf2"><span class="section-number-2">2</span> Preamble</h2>
+<aside class="notes">
+<p>
+Most slides will have some code, not all of it will be best practice, but
+eventually we should get there.
+</p>
+
+<p>
+As this talk is designed so everyone can get something out of it, if
+you're unsure of something or don't understand please ask questions.
+</p>
+
+</aside>
+</section>
+<section id="slide-org7dab42e">
+<h3 id="org7dab42e"><span class="section-number-3">2.1</span> Goals</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+</section>
+<section id="slide-org8e7b877">
+<h4 id="org8e7b877"><span class="section-number-4">2.1.1</span> Increase your knowledge of RSpec</h4>
+<aside class="notes">
+<p>
+I don't want this to be taken as patronising, I believe one should never
+stop learning. Even while preparing this talk I've learned a few
+things myself which have already impacted the way I write specs.
+</p>
+
+</aside>
+</section>
+<section id="slide-orgf42bc12">
+<h4 id="orgf42bc12"><span class="section-number-4">2.1.2</span> Increase your comfort level in RSpec</h4>
+<aside class="notes">
+<p>
+Just like any other tool, the more knowledgeable of something you are
+the more comfortable you should be using it.
+</p>
+
+</aside>
+</section>
+<section id="slide-org0cc55e1">
+<h4 id="org0cc55e1"><span class="section-number-4">2.1.3</span> Increase the reliability and readability of specs</h4>
+<aside class="notes">
+<p>
+RSpec is designed not just to be written, but also read. Following
+best practices will help you write more readable specs which in turn
+will make them more reliable and maintainable.
+</p>
+
+<p>
+If you can understand what a spec should do, you should be able to
+understand it.
+</p>
+
+<p>
+As a rule of thumb, the documentation string should provide enough
+context to know what the example is testing
+</p>
+
+<p>
+Sometimes they can get pretty verbose, but that should be a sign that
+there is a lot of context going into the example you're describing
+</p>
+
+</aside>
+</section>
+<section id="slide-org779a624">
+<h3 id="org779a624"><span class="section-number-3">2.2</span> How?</h3>
+
+<div class="figure">
+<p><img src="./assets/bikes.jpg" alt="bikes.jpg" />
+</p>
+</div>
+<aside class="notes">
+<p>
+I'm taking a page out of Sandi Metz's book, take something everyone
+should be familiar with and relating to a subject matter they may not
+be familiar with.
+</p>
+
+</aside>
+</section>
+<section id="slide-orgf89701d">
+<h4 id="orgf89701d"><span class="section-number-4">2.2.1</span> Explain the DSL</h4>
+<p>
+Start simple and build up
+</p>
+<aside class="notes">
+<p>
+In this case we'll be looking at specs for a Bike and without looking
+into how it's implemented I should be able thoroughly describe how a
+Bike works.
+</p>
+
+</aside>
+</section>
+<section id="slide-org6129ada">
+<h4 id="org6129ada"><span class="section-number-4">2.2.2</span> Explain the Friction and Pain</h4>
+<aside class="notes">
+<p>
+Generally either mean you're moving in a direction your tool doesn't want
+you to.
+</p>
+
+</aside>
+<p>
+Bike time!
+</p>
+<aside class="notes">
+<p>
+Imagine you're riding a bike and decide you want to stop. You grab the
+tyre eventually coming to a stop, but not with nearly as much skin on
+your hands as when you started. Sure it worked, but there are other
+tools you can utilise to remove the pain and make your life easier.
+</p>
+
+</aside>
+</section>
+<section id="slide-org74d5b78">
+<h3 id="org74d5b78"><span class="section-number-3">2.3</span> What won't be covered (today)</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+</section>
+<section id="slide-org75eb64c">
+<h4 id="org75eb64c"><span class="section-number-4">2.3.1</span> Capybara</h4>
+<aside class="notes">
+<p>
+This is basically a separate DSL ontop of the RSpec DSL, I will be
+covering this in a separate talk to give it the attention it deserves.
+</p>
+
+</aside>
+</section>
+<section id="slide-org29a82f0">
+<h4 id="org29a82f0"><span class="section-number-4">2.3.2</span> Quantum Field Theory</h4>
+<aside class="notes">
+<p>
+Honestly I just don't time, but I'd love to chat about it
+</p>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org5589fbd">
+<h2 id="org5589fbd"><span class="section-number-2">3</span> DSL</h2>
+<p>
+As RSpec is a DSL, generally everything you do utilise the DSL
+</p>
+<aside class="notes">
+<p>
+This may seem an odd order to do things in, but I'd rather focus on as
+few things at a time so that everything gets the attention it
+deserves.
+</p>
+
+<p>
+Throughout these examples we will be
+</p>
+
+</aside>
+</section>
+<section id="slide-org332ca08">
+<h3 id="org332ca08"><span class="section-number-3">3.1</span> let</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >let(:bike) { Bike.new }
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Let is one of the most basic concepts in RSpec, it is how you introduce
+important variables to scope of what you're testing.
+</p>
+
+</aside>
+</section>
+<section id="slide-org0f737f3">
+<h4 id="org0f737f3"><span class="section-number-4">3.1.1</span> let!</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >let!(:bike) { Bike.new }
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+let! is let but with a reference in an implicit before block, this
+allows you to evaluate and memoise the value before any of your
+example runs
+</p>
+
+</aside>
+</section>
+<section id="slide-org6ebf955">
+<h3 id="org6ebf955"><span class="section-number-3">3.2</span> subject</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >subject { bike.gear }
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Subject is used to communicate to the reader what is being tested.
+</p>
+
+<p>
+Internally it's mostly just let(:subject)
+</p>
+
+</aside>
+</section>
+<section id="slide-org56a491d">
+<h4 id="org56a491d"><span class="section-number-4">3.2.1</span> subject!</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >subject! { bike.gear }
+</code></pre>
+</div>
+</section>
+<section id="slide-org5fb29ae">
+<h4 id="org5fb29ae"><span class="section-number-4">3.2.2</span> named subject</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >subject(:shift_up) { bike.shift_up }
+</code></pre>
+</div>
+</section>
+<section id="slide-orgebb8290">
+<h3 id="orgebb8290"><span class="section-number-3">3.3</span> describe</h3>
+<p>
+Convey what is being tested
+</p>
+<aside class="notes">
+<p>
+Describe blocks convey what is being tested, whether that be a class
+or a method.
+</p>
+
+<p>
+Furthermore you should generally limit the depth of describe blocks to
+two, one for your class and another for your method.
+</p>
+
+</aside>
+</section>
+<section id="slide-org90344c0">
+<h4 id="org90344c0"><span class="section-number-4">3.3.1</span> class</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe Bike do
+end
+</code></pre>
+</div>
+</section>
+<section id="slide-org1afae35">
+<h4 id="org1afae35"><span class="section-number-4">3.3.2</span> method</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+  let(:bike) { described_class.new }
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Method describe block names should reflect the method you're testing
+</p>
+
+</aside>
+</section>
+<section id="slide-orga201bda">
+<h3 id="orga201bda"><span class="section-number-3">3.4</span> context</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >context "when in highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Context blocks provide context to the current example, generally here
+is where you'll setup the state of the world you're testing
+</p>
+
+</aside>
+</section>
+<section id="slide-org6885050">
+<h4 id="org6885050"><span class="section-number-4">3.4.1</span> Negative case</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >context "when not in the highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MIN_GEAR) }
+end
+</code></pre>
+</div>
+</section>
+<section id="slide-orgac8461f">
+<h3 id="orgac8461f"><span class="section-number-3">3.5</span> it</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >it "shifts up one gear" do
+  expect { shift_up }.to change(bike, :gear).by(1)
+end
+</code></pre>
+</div>
+<blockquote nil>
+<p>
+Bike #shift_up when not in the highest gear shifts up one gear
+</p>
+</blockquote>
+<aside class="notes">
+<p>
+It blocks are the way you describe the behaviour, the most common form
+is a multi-line it block with a description and a body with generally
+one expectation.
+</p>
+
+</aside>
+</section>
+<section id="slide-org16bca31">
+<h4 id="org16bca31"><span class="section-number-4">3.5.1</span> single line</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >it { expect { shift_up }.to change(bike, :gear).by(1) }
+</code></pre>
+</div>
+<blockquote nil>
+<p>
+Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+</p>
+</blockquote>
+<aside class="notes">
+<p>
+Sometimes it's easier and cleaner to use a single line expectation.
+For this form you will omit the documentation string and sometimes
+switch to using is_expected over expect(subject), this should only be
+used when it makes the
+</p>
+
+</aside>
+</section>
+<section id="slide-org9795e52">
+<h3 id="org9795e52"><span class="section-number-3">3.6</span> specify</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >specify { expect { shift_up }.to change(bike, :gear).by(1) }
+</code></pre>
+</div>
+<blockquote nil>
+<p>
+Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+</p>
+</blockquote>
+<aside class="notes">
+<p>
+Specify's primary use is when creating an example without a dosctring,
+and with multiple lines the last executed example will produce the
+docstring
+</p>
+
+</aside>
+</section>
+<section id="slide-org23126fe">
+<h4 id="org23126fe"><span class="section-number-4">3.6.1</span> specify with docstring</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >specify "when called multiple times is idempotent" do
+  # ...
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+The lesser used form with a docstring should only be used when a
+docstring reads poorly with it, remember specs are going to be read
+more often than written.
+</p>
+
+<p>
+Generally I'd discourage the use of either, as they make the source
+code arguably harder to read, but do have their place
+</p>
+
+</aside>
+</section>
+<section id="slide-orgd1fee07">
+<h3 id="orgd1fee07"><span class="section-number-3">3.7</span> <span class="todo TODO">TODO</span> hooks</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >before { bike.remove_chain }
+after { bike.install_chain }
+# or
+around do |example|
+  bike.remove_chain
+  example.call
+  bike.install_chain
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Hooks allow you to setup the state of the world in a way which lets
+won't let you do.
+</p>
+
+<p>
+Most of your shared setup should go inside of before blocks
+</p>
+
+</aside>
+</section>
+<section id="slide-org8e17284">
+<h3 id="org8e17284"><span class="section-number-3">3.8</span> shared context</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >shared_context "in highest gear" do
+  let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Is their copy pasta inside your specs? Shared contexts are your saviour.
+</p>
+
+</aside>
+</section>
+<section id="slide-org8296337">
+<h3 id="org8296337"><span class="section-number-3">3.9</span> <span class="todo TODO">TODO</span> shared examples</h3>
+<aside class="notes">
+<p>
+Ever seen iteration with an it block inside of it? This is what shared
+examples are for. They allow you to abstract out the functionality to
+code blocks which you can include.
+</p>
+
+</aside>
+</section>
+<section id="slide-orgfcdd6ca">
+<h3 id="orgfcdd6ca"><span class="section-number-3">3.10</span> should</h3>
+<p>
+You <span class="underline">should</span> not use it
+</p>
+<aside class="notes">
+<p>
+It's a big monkey patch which has since fallen out of favour with the
+preference now being to use expect.
+</p>
+
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org93f9009">
+<h2 id="org93f9009"><span class="section-number-2">4</span> Take Aways</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+</section>
+<section id="slide-org41f96b8">
+<h3 id="org41f96b8"><span class="section-number-3">4.1</span> Friction and Pain</h3>
+<p>
+Generally either mean you're moving in a direction your tool doesn't want
+you to.
+</p>
+</section>
+</section>
+<section>
+<section id="slide-orgcf7fbe8">
+<h2 id="orgcf7fbe8"><span class="section-number-2">5</span> Pro tips (by Tony Hawk)</h2>
+<p>
+Various things which generally can't be statically detected and rely
+on the writer's experience
+</p>
+</section>
+<section id="slide-org1863342">
+<h3 id="org1863342"><span class="section-number-3">5.1</span> Incidental State or How I Learned to Stop Worrying and Love Block Expectations</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" ># bad
+it "shifts up one gear" do
+  previous_gear = bike.gear
+  shift_up
+  # ...
+  expect(bike.gear).to eq previous + 1
+end
+
+# good
+it "shifts up one gear" do
+  expect { shift_up }.to change(bike, :gear).by(1)
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+By utilising block expectations we limit the scope in which we're
+testing, which allows us to better understand exactly what is being
+tested as well as isolates us from
+</p>
+
+</aside>
+</section>
+<section id="slide-org82dec79">
+<h4 id="org82dec79"><span class="section-number-4">5.1.1</span> Raise error</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >context "when chain is disconnected" do
+  include_conext "chain disconnected"
+
+  it { expect { shift_up }.to raise_error /No chain/ }
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+If you've seen block expectations before, this is likely where you've
+seen them.
+</p>
+
+<p>
+I find them mainly useful when working with external libraries that
+utilise exceptions for control flow. Generally in code you own you
+should avoid exceptions as control flow but occassionaly they do have
+their place.
+</p>
+
+</aside>
+</section>
+<section id="slide-org5a27ac8">
+<h4 id="org5a27ac8"><span class="section-number-4">5.1.2</span> Composing matchers</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe "#remove_chain" do
+  # ...
+  context "when chain is attached" do
+    include_context "chain is attached"
+
+    specify do
+      expect { remove_chain }.to change(bike, :chain_attached?)
+                                   .from(true)
+                                   .to(false)
+    end
+  end
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Now that we've seen a bit of composing, lets take a look at a more
+composed example.
+</p>
+
+<p>
+While this is a semi-contrived example it shows a way that you can add
+additional conditions to your example without adding additional
+expectations.
+</p>
+
+<p>
+Imagine (all the people) a scenario where this example was given a
+bike without the chain attached. If you hadn't used the combination of
+from and to you would get a false positive if #remove_chain doesn't
+raise an error when no chain is attached.
+</p>
+
+</aside>
+</section>
+<section id="slide-org9ba1009">
+<h4 id="org9ba1009"><span class="section-number-4">5.1.3</span> <span class="todo TODO">TODO</span> Yielding</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Yielding matchers are indispensable when working with custom
+containers or methods that help facilitate iteration.
+</p>
+
+</aside>
+</section>
+<section id="slide-org00cddac">
+<h3 id="org00cddac"><span class="section-number-3">5.2</span> So I lied</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe "#shift_up" do
+  subject(:shift_up) { bike.shift_up }
+
+  specify "when called multiple times increases the gear each time" do
+    expect { shift_up }.to change(bike, :gear).by(1) # will pass
+    expect { shift_up }.to change(bike, :gear).by(1) # will fail
+  end
+end
+</code></pre>
+</div>
+<blockquote nil>
+<p>
+When testing the idempotency of something, if you're calling
+a <code>let</code> (e.g. a named subject) you're getting a memoised value which
+will give you a false sense of idempotency.
+</p>
+</blockquote>
+</section>
+<section id="slide-orgc4cb52e">
+<h4 id="orgc4cb52e"><span class="section-number-4">5.2.1</span> Making it work</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe "#shift_up" do
+  specify "when called multiple times changes gear each time" do
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will pass
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will also pass
+  end
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+In this case prefer calling a method on an object instead
+</p>
+
+</aside>
+</section>
+<section id="slide-org7e0a9c0">
+<h4 id="org7e0a9c0"><span class="section-number-4">5.2.2</span> Clever use of game mechanics (exploits)</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >describe "#shift_up" do
+  subject(:shift_up) { -&gt; { bike.shift_up } }
+
+  specify "when called multiple times changes gear each time" do
+    is_expected.to change(bike, :gear).by(1) # will pass
+    is_expected.to change(bike, :gear).by(1) # will also pass
+  end
+end
+</code></pre>
+</div>
+
+<div class="figure">
+<p><img src="./assets/itjustworks.jpg" alt="itjustworks.jpg" />
+</p>
+</div>
+<aside class="notes">
+<p>
+This used to be "supported" (read: clever use of game mechanics) with
+implicit block expectations, however others don't seem so keen to
+exploits ¯\_(ツ)_/¯
+</p>
+
+</aside>
+</section>
+<section id="slide-orga191fc8">
+<h3 id="orga191fc8"><span class="section-number-3">5.3</span> Multiple Expectations</h3>
+<aside class="notes">
+<p>
+This was actually something brought up when we added rubocop-rspec to
+flatbook so I'd like to spend a bit discussing the theory. There are
+two ways this can be handled inside of the specs and other ways you
+can restructure your code to make them less desireable overall.
+</p>
+
+</aside>
+</section>
+<section id="slide-org146b662">
+<h4 id="org146b662"><span class="section-number-4">5.3.1</span> Separate examples</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >it { is_expected.to start_with("WARNING:") }
+it { is_expected.to end_with "!" }
+</code></pre>
+</div>
+<blockquote nil>
+<ol>
+<li>warning is expected to start with "WARNING:"
+Failure/Error: it { is_expected.to start_with("WARNING:") }
+  expected "WARN &#x2013; Something is messed up." to start with "WARNING:"</li>
+
+<li>warning is expected to end with "!"
+Failure/Error: it { is_expected.to end_with "!" }
+  expected "WARN &#x2013; Something is messed up." to end with "!"</li>
+
+</ol>
+</blockquote>
+<aside class="notes">
+<p>
+There are two main downsides to this approach, it increases the amount
+of examples you run, and due to having to setup the context each time
+increases the run time more than having them in the same example.
+</p>
+
+<p>
+The main reason you'd choose this approach is that it's the convention
+of rspec, i.e. single expectation per spec and usually you're going to
+get more readable expectations
+</p>
+
+</aside>
+</section>
+<section id="slide-org5393863">
+<h4 id="org5393863"><span class="section-number-4">5.3.2</span> Aggregate failures</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >it "passes our validations", aggregate_failures: true do
+  expect(warning).to start_with("WARNING:")
+  expect(warning).to end_with("!")
+end
+</code></pre>
+</div>
+<blockquote nil>
+<ol>
+<li><p>
+warning passes our validations
+Got 2 failures:
+</p>
+
+<p>
+1.1) Failure/Error: expect(warning).to start_with("WARNING:")
+       expected "WARN &#x2013; Something is messed up." to start with "WARNING:"
+</p>
+
+<p>
+1.2) Failure/Error: expect(warning).to end_with("!")
+       expected "WARN &#x2013; Something is messed up." to end with "!"
+</p></li>
+
+</ol>
+</blockquote>
+<aside class="notes">
+nil
+</aside>
+</section>
+<section id="slide-org989c976">
+<h4 id="org989c976"><span class="section-number-4">5.3.3</span> Compound expectations</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >it { is_expected.to start_with("WARNING:").and end_with("!") }
+</code></pre>
+</div>
+<blockquote nil>
+<ol>
+<li><p>
+warning is expected to start with "WARNING:" and end with "!"
+Failure/Error: it { is_expected.to start_with("WARNING:").and end_with("!") }
+</p>
+
+<p>
+expected "WARN &#x2013; Something is messed up." to start with "WARNING:"
+</p>
+
+<p>
+&#x2026;and:
+</p>
+
+<p>
+expected "WARN &#x2013; Something is messed up." to end with "!"
+</p></li>
+
+</ol>
+</blockquote>
+</section>
+<section id="slide-orgfa0d25a">
+<h3 id="orgfa0d25a"><span class="section-number-3">5.4</span> Custom Matchers</h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" >RSpec::Matchers.define :be_a_warning do
+  match do |actual|
+    actual.start_with?("WARNING:") &amp;&amp; actual.end_with?("!")
+  end
+end
+
+it { is_expected.to be_a_warning }
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Following the previous multiple expectations for detecting a warning
+here is how one could write a custom matcher to handle both of the
+expectations.
+</p>
+
+<p>
+Most complex expectations which have multiple "expectations" I would
+geenerally write matchers for. This allows you to name what you're
+expecting and provides greater flexability around
+</p>
+
+</aside>
+</section>
+<section id="slide-org37facf3">
+<h4 id="org37facf3"><span class="section-number-4">5.4.1</span> <span class="todo TODO">TODO</span> Complex Custom Matcher</h4>
+<div class="org-src-container">
+
+<pre><code class="ruby" >RSpec::Matchers.define :be_bigger_than do |first|
+  match do |actual|
+    (actual &gt; first) &amp;&amp; (actual &lt; @second)
+  end
+
+  chain :but_smaller_than do |second|
+    @second = second
+  end
+end
+
+describe 5 do
+  it { should be_bigger_than(4).but_smaller_than(6) }
+end
+</code></pre>
+</div>
+<aside class="notes">
+nil
+</aside>
+</section>
+</section>
+<section>
+<section id="slide-org6c542de">
+<h2 id="org6c542de"><span class="section-number-2">6</span> Struggle Bus</h2>
+</section>
+</section>
+<section>
+<section id="slide-orge585eff">
+<h2 id="orge585eff"><span class="section-number-2">7</span> References</h2>
+<p>
+Various code snippets and ideas from <a href="https://rspec.rubystyle.guide/">rubocop rspec-style-guide</a>
+</p>
+</section>
+</section>
+<section>
+<section id="slide-org8101834">
+<h2 id="org8101834"><span class="section-number-2">8</span> Garbage</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+</section>
+<section id="slide-org7366359">
+<h3 id="org7366359"><span class="section-number-3">8.1</span> More real world example&#xa0;&#xa0;&#xa0;<span class="tag"><span class="cut">cut</span></span></h3>
+<div class="org-src-container">
+
+<pre><code class="ruby" ># bad
+it "publishes the article" do
+  article.publish
+
+  # Creating another shared Article test object above would cause this
+  # test to break
+  expect(Article.count).to eq(2)
+end
+
+# good
+it "publishes the article" do
+  expect { article.publish }.to change(Article, :count).by(1)
+end
+</code></pre>
+</div>
+<aside class="notes">
+<p>
+Honestly I couldn't put it better than rubocop's rspec style guide,
+becoming comfortable with block expectations greatly increases your
+ability to write readable and confident specs
+</p>
+
+</aside>
+</section>
+</section>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/npm/reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+slideNumber:false,
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/npm/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }]
+});
+</script>
+</body>
+</html>
