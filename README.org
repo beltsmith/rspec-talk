@@ -6,10 +6,12 @@
 #+REVEAL_INIT_OPTIONS: slideNumber:false
 #+OPTIONS: toc:nil ^:nil
 * Timeline
-- Preamble
+- Introduction
 - DSL
 - Pro Tips (by Tony Hawk)
-* Preamble
+* Slides
+[[https://www.github.com/beltsmith/rspec-talk][Available on github:beltsmith/rspec-talk]]
+* Introduction
 #+begin_notes
 Most slides will have some code, not all of it will be best practice, but
 eventually we should get there.
@@ -148,6 +150,7 @@ end
 Method describe block names should reflect the method you're testing
 #+end_notes
 ** context
+Convey the state of the world being tested
 #+begin_src ruby
 context "when in highest gear" do
   let(:bike) { described_class.new(gear: Bike::MAX_GEAR) }
@@ -170,7 +173,7 @@ it "shifts up one gear" do
 end
 #+end_src
 #+begin_quote
-Bike #shift_up when not in the highest gear shifts up one gear
+Bike#shift_up when not in the highest gear shifts up one gear
 #+end_quote
 #+begin_notes
 It blocks are the way you describe the behaviour, the most common form
@@ -182,7 +185,7 @@ one expectation.
 it { expect { shift_up }.to change(bike, :gear).by(1) }
 #+end_src
 #+begin_quote
-Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+Bike#shift_up when not in the highest gear is expected to change `Bike#gear` by 1
 #+end_quote
 #+begin_notes
 Sometimes it's easier and cleaner to use a single line expectation.
@@ -195,7 +198,7 @@ used when it makes the
 specify { expect { shift_up }.to change(bike, :gear).by(1) }
 #+end_src
 #+begin_quote
-Bike #shift_up when not in the highest gear is expected to change `Bike#gear` by 1
+Bike#shift_up when not in the highest gear is expected to change `Bike#gear` by 1
 #+end_quote
 #+begin_notes
 Specify's primary use is when creating an example without a dosctring,
@@ -216,7 +219,7 @@ more often than written.
 Generally I'd discourage the use of either, as they make the source
 code arguably harder to read, but do have their place
 #+end_notes
-** TODO hooks
+** hooks
 #+begin_src ruby
   before { bike.remove_chain }
   after { bike.install_chain }
@@ -233,6 +236,22 @@ won't let you do.
 
 Most of your shared setup should go inside of before blocks
 #+end_notes
+** hooks
+#+begin_quote
+around suite before
+before suite
+around all before
+before all
+around each before
+before each
+example
+after each
+around each after
+after all
+around all after
+after suite
+around suite after
+#+end_quote
 ** shared context
 #+begin_src ruby
 shared_context "in highest gear" do
@@ -242,11 +261,22 @@ end
 #+begin_notes
 Is their copy pasta inside your specs? Shared contexts are your saviour.
 #+end_notes
-** TODO shared examples
+** shared examples
+#+begin_src ruby
+describe 'GET /devices' do
+  let(:resource) { FactoryBot.create(:device, created_from: user) }
+
+  it_behaves_like 'a listable resource'
+  it_behaves_like 'a paginable resource'
+  it_behaves_like 'a searchable resource'
+  it_behaves_like 'a filterable list'
+end
+#+end_src
 #+begin_notes
-Ever seen iteration with an it block inside of it? This is what shared
-examples are for. They allow you to abstract out the functionality to
-code blocks which you can include.
+Two main ways you can utilise shared examples:
+
+1. remove iteration
+2. remove duplicated code
 #+end_notes
 ** should
 You _should_ not use it
@@ -255,10 +285,18 @@ It's a big monkey patch which has since fallen out of favour with the
 preference now being to use expect.
 #+end_notes
 * Take Aways
+** DSL
+It's there to help you
 ** Friction and Pain
 Generally either mean you're moving in a direction your tool doesn't want
 you to.
 * Pro tips (by Tony Hawk)
+#+REVEAL_HTML: <style> .reveal pre { font-size: 20px } </style>
+#+REVEAL_HTML: <style> .reveal blockquote { white-space: pre-wrap; font-size: 20px; text-align: initial } </style>
+#+REVEAL_HTML: <style> .reveal blockquote p { margin: 0 } </style>
+#+REVEAL_HTML: <style> .reveal blockquote:first-line { line-height: 0 } </style>
+#+REVEAL_HTML: <style> .reveal blockquote p:first-line { line-height: 0 } </style>
+#+REVEAL_HTML: <style> .reveal .wide-quote blockquote { width: 75% } </style>
 Various things which generally can't be statically detected and rely
 on the writer's experience
 ** Incidental State or How I Learned to Stop Worrying and Love Block Expectations
@@ -326,14 +364,6 @@ bike without the chain attached. If you hadn't used the combination of
 from and to you would get a false positive if #remove_chain doesn't
 raise an error when no chain is attached.
 #+end_notes
-*** TODO Yielding
-#+begin_src ruby
-
-#+end_src
-#+begin_notes
-Yielding matchers are indispensable when working with custom
-containers or methods that help facilitate iteration.
-#+end_notes
 ** So I lied
 #+begin_src ruby
 describe "#shift_up" do
@@ -355,14 +385,14 @@ will give you a false sense of idempotency.
 describe "#shift_up" do
   specify "when called multiple times changes gear each time" do
     expect { bike.shift_up }.to change(bike, :gear).by(1) # will pass
-    expect { bike.shift_up }.to change(bike, :gear).by(1) # will also pass
+    expect { bike.shift_up }.to change(bike, :gear).by(1) # will pass
   end
 end
 #+end_src
 #+begin_notes
 In this case prefer calling a method on an object instead
 #+end_notes
-*** Clever use of game mechanics (exploits)
+*** Exploits (clever use of game mechanics)
 #+begin_src ruby
 describe "#shift_up" do
   subject(:shift_up) { -> { bike.shift_up } }
@@ -382,9 +412,13 @@ exploits ¯\_(ツ)_/¯
 ** Multiple Expectations
 #+begin_notes
 This was actually something brought up when we added rubocop-rspec to
-flatbook so I'd like to spend a bit discussing the theory. There are
-two ways this can be handled inside of the specs and other ways you
-can restructure your code to make them less desireable overall.
+flatbook so I'd like to spend a bit discussing the theory.
+
+Multiple exceptions per
+
+There are two ways this can be handled inside of the specs and other
+ways you can restructure your code to make them less desireable
+overall.
 #+end_notes
 *** Separate examples
 #+begin_src ruby
@@ -392,13 +426,13 @@ it { is_expected.to start_with("WARNING:") }
 it { is_expected.to end_with "!" }
 #+end_src
 #+begin_quote
-1) warning is expected to start with "WARNING:"
-   Failure/Error: it { is_expected.to start_with("WARNING:") }
-     expected "WARN -- Something is messed up." to start with "WARNING:"
+warning is expected to start with "WARNING:"
+Failure/Error: it { is_expected.to start_with("WARNING:") }
+  expected "WARN -- Something is messed up." to start with "WARNING:"
 
-2) warning is expected to end with "!"
-   Failure/Error: it { is_expected.to end_with "!" }
-     expected "WARN -- Something is messed up." to end with "!"
+warning is expected to end with "!"
+Failure/Error: it { is_expected.to end_with "!" }
+  expected "WARN -- Something is messed up." to end with "!"
 #+end_quote
 #+begin_notes
 There are two main downsides to this approach, it increases the amount
@@ -417,14 +451,14 @@ it "passes our validations", aggregate_failures: true do
 end
 #+end_src
 #+begin_quote
-1) warning passes our validations
-   Got 2 failures:
+warning passes our validations
+Got 2 failures:
 
-   1.1) Failure/Error: expect(warning).to start_with("WARNING:")
-          expected "WARN -- Something is messed up." to start with "WARNING:"
+1.1) Failure/Error: expect(warning).to start_with("WARNING:")
+       expected "WARN -- Something is messed up." to start with "WARNING:"
 
-   1.2) Failure/Error: expect(warning).to end_with("!")
-          expected "WARN -- Something is messed up." to end with "!"
+1.2) Failure/Error: expect(warning).to end_with("!")
+       expected "WARN -- Something is messed up." to end with "!"
 #+end_quote
 #+begin_notes
 #+end_notes
@@ -433,14 +467,14 @@ end
 it { is_expected.to start_with("WARNING:").and end_with("!") }
 #+end_src
 #+begin_quote
-1) warning is expected to start with "WARNING:" and end with "!"
-   Failure/Error: it { is_expected.to start_with("WARNING:").and end_with("!") }
+warning is expected to start with "WARNING:" and end with "!"
+Failure/Error: it { is_expected.to start_with("WARNING:").and end_with("!") }
 
-        expected "WARN -- Something is messed up." to start with "WARNING:"
+     expected "WARN -- Something is messed up." to start with "WARNING:"
 
-     ...and:
+  ...and:
 
-        expected "WARN -- Something is messed up." to end with "!"
+     expected "WARN -- Something is messed up." to end with "!"
 #+end_quote
 ** Custom Matchers
 #+begin_src ruby
@@ -461,46 +495,124 @@ Most complex expectations which have multiple "expectations" I would
 geenerally write matchers for. This allows you to name what you're
 expecting and provides greater flexability around
 #+end_notes
-*** TODO Complex Custom Matcher
+*** Complex Custom Matcher
 #+begin_src ruby
-RSpec::Matchers.define :be_bigger_than do |first|
+RSpec::Matchers.define :shift_gear_of do |bike|
   match do |actual|
-    (actual > first) && (actual < @second)
+    @delta ||= 1
+
+    previous_gear = bike.gear
+    actual.call
+    bike.gear == previous_gear + delta
   end
 
-  chain :but_smaller_than do |second|
-    @second = second
-  end
-end
+  chain :by, :delta
 
-describe 5 do
-  it { should be_bigger_than(4).but_smaller_than(6) }
+  supports_block_expectations
 end
 #+end_src
 #+begin_notes
+Custom matchers aren't only useful for
+
+Let's take a look at how we can encapsulate the idea of shifting gears
+into a matcher so we can better describe how a bike should work.
 #+end_notes
-* Struggle Bus
+*** Using the custom matcher
+#+begin_src ruby
+specify { expect { shift_up }.to shift_gear_of(bike).by(1) }
+#+end_src
+#+begin_quote
+Bike#shift_up when not in the highest gear is expected to shift gear by 1
+#+end_quote
+*** Even More Complex Custom Matcher
+#+begin_notes
+For this it's going to be best to look at this matcher in parts
+#+end_notes
+#+begin_src ruby
+RSpec::Matchers.define :shift_gear_of do |bike|
+  match do |actual|
+    @delta ||= 1
+    @direction ||= nil
+
+    @previous_gear = bike.gear
+
+    actual.call
+
+    @actual_delta = bike.gear - @previous_gear
+    @actual_delta == @delta
+  end
+
+  chain :by, :delta
+
+  supports_block_expectations
+end
+#+end_src
+*** Complex chains
+#+begin_src ruby
+chain :up do |delta|
+  @direction = :up
+  @delta = delta
+end
+
+chain :down do |delta|
+  @direction = :down
+  @delta = - delta
+end
+#+end_src
+*** Complex description
+#+begin_src ruby
+description do
+  case @direction
+  when :up
+    "shift gear up #{@delta}"
+  when :down
+    "shift gear down #{- @delta}"
+  else
+    "shift gear by #{@delta}"
+  end
+end
+#+end_src
+*** Standard failure message
+#+begin_src ruby
+specify { expect { shift_up }.to shift_gear_of(bike).down(1) }
+#+end_src
+#+begin_quote
+Bike#shift_up when not in the highest gear is expected to shift gear down 1
+Failure/Error: specify { expect { shift_up }.to shift_gear_of(bike).down(1) }
+  expected #<Proc:0x000056066cfc6c28@bike_spec.rb:97> to shift gear down 1
+#+end_quote
+#+begin_notes
+Let's take a look at what happens when this expectation isn't met.
+
+Sometimes the generated failure message is enough, although I often
+find them missing some key information. Let's take a look at how we
+can spruce this up.
+#+end_notes
+*** Custom failure message
+#+begin_src ruby
+failure_message do
+  actual_direction = @actual_delta > 0 ? :up : :down
+
+  ["expected block to #{description}",
+   "but shifted #{actual_direction} #{@actual_delta.abs}"].join(", ")
+end
+#+end_src
+
+*** Putting it all together
+#+REVEAL_HTML: <div class="wide-quote">
+#+begin_src ruby
+specify { expect { shift_up }.to shift_gear_of(bike).by(1) }
+specify { expect { shift_up }.to shift_gear_of(bike).up(1) }
+specify { expect { shift_up }.to shift_gear_of(bike).down(1) }
+#+end_src
+#+begin_quote
+Bike#shift_up when not in the highest gear is expected to shift gear by 1
+Bike#shift_up when not in the highest gear is expected to shift gear up 1
+Bike#shift_up when not in the highest gear is expected to shift gear down 1 (FAILED - 1)
+1) Bike#shift_up when not in the highest gear is expected to shift gear down 1
+   Failure/Error: specify { expect { shift_up }.to shift_gear_of(bike).down(1) }
+     expected block to shift gear down 1, but shifted up 1
+#+end_quote
+#+REVEAL_HTML: </div>
 * References
 Various code snippets and ideas from [[https://rspec.rubystyle.guide/][rubocop rspec-style-guide]]
-* Garbage
-** More real world example                                             :cut:
-#+begin_src ruby
-# bad
-it "publishes the article" do
-  article.publish
-
-  # Creating another shared Article test object above would cause this
-  # test to break
-  expect(Article.count).to eq(2)
-end
-
-# good
-it "publishes the article" do
-  expect { article.publish }.to change(Article, :count).by(1)
-end
-#+end_src
-#+begin_notes
-Honestly I couldn't put it better than rubocop's rspec style guide,
-becoming comfortable with block expectations greatly increases your
-ability to write readable and confident specs
-#+end_notes
